@@ -35,3 +35,19 @@ def listado_libros(request):
     return paginador.get_paginated_response(datos)
 
 
+from rest_framework import viewsets
+from .models import Autor
+from .serializers import AutorSerializer, LibroSerializer
+
+
+# Diferencia entre PUT y PATCH:
+# PUT actualiza el registro COMPLETO: hay que enviar todos los campos.
+# PATCH actualiza solo UNA PARTE: se envían únicamente los campos que quieres cambiar.
+class AutorViewSet(viewsets.ModelViewSet):
+    queryset = Autor.objects.all().order_by('nombre')
+    serializer_class = AutorSerializer
+
+
+class LibroViewSet(viewsets.ModelViewSet):
+    queryset = Libro.objects.all().order_by('titulo')
+    serializer_class = LibroSerializer
