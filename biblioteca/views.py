@@ -11,11 +11,16 @@ def resumen(request):
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from .models import Libro
 
 @api_view(['GET'])
 def listado_libros(request):
-    libros = Libro.objects.all()
+    libros = Libro.objects.all().order_by('id')
+
+    paginador = PageNumberPagination()
+    pagina = paginador.paginate_queryset(libros, request)
+
     datos = [
         {
             "id": libro.id,
@@ -23,10 +28,10 @@ def listado_libros(request):
             "autor": libro.autor.nombre,
             "precio": libro.precio,
             "disponible": libro.disponible,
-            'descripcion': libro.titulo + ' escrito por ' + libro.autor,
+            "descripcion": libro.titulo + ' escrito por ' + libro.autor.nombre,
         }
-        for libro in libros
+        for libro in pagina
     ]
-    return Response(datos)
+    return paginador.get_paginated_response(datos)
 
 

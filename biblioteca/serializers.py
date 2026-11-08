@@ -1,3 +1,4 @@
+from datetime import date
 from rest_framework import serializers
 from .models import Autor, Libro
 
@@ -20,9 +21,14 @@ class LibroSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        # Validación que involucra más de un campo a la vez
-        if not data.get('disponible', True) and data.get('precio', 0) == 0:
-            raise serializers.ValidationError("Un libro no disponible no puede tener precio 0.")
+        # Validación que involucra más de un campo a la vez:
+        # un libro con fecha de publicación futura no puede estar disponible.
+        fecha = data.get('fecha_publicacion')
+        disponible = data.get('disponible', True)
+        if fecha is not None and fecha > date.today() and disponible:
+            raise serializers.ValidationError(
+                "Un libro con fecha de publicación futura no puede estar disponible."
+            )
         return data
 
 
